@@ -57,6 +57,15 @@ select users.name, users.email, roles.name as role from users left join roles on
 psql -h 127.0.0.1 -U api api
 # provide 'netlab' password
 ```
+### HTTP function
+```bash
+func handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hi there, I love %s!\n", r.URL.Path[1:])
+}
+```
+%s is r.URL.Path[1:];
+r in r.URL.Path[1:] is the var containing the whole url from the request, i.e. 'curl -D - -s http://127.0.0.1:8080/makuznet', will result in extracting 'makuznet' from the url path ([1:] means provide what is written after the first sign of url path) and putting it in to the answ er 'Hi there, I love makuznet!' instead of %s var.
+
 Were not mentioned:
 - [Create sequence](https://postgrespro.ru/docs/postgresql/9.6/sql-createsequence)  
 - [PostgreSQL foreign key](https://www.postgresqltutorial.com/postgresql-foreign-key)  

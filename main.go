@@ -3,6 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"net/http"
 
 	_ "github.com/lib/pq"
 )
@@ -33,5 +35,12 @@ func main() {
 		fmt.Printf("%d\n", name)
 	}
 
+	http.HandleFunc("/", handler)
+	log.Fatal(http.ListenAndServe(":8080", nil))
+
 	defer db.Close()
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hi there, I love %s!\n", r.URL.Path[1:])
 }
