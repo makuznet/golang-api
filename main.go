@@ -32,7 +32,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("%d\n", name)
+		fmt.Printf("%s\n", name)
 	}
 
 	http.HandleFunc("/", handler)
