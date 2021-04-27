@@ -11,7 +11,7 @@ func main() {
 
 	fmt.Println("Hello, World!")
 
-	dbinfo := fmt.Sprintf("host=127.0.0.1 user=api password=netlab dbname=api sslmode=disable")
+	dbinfo := fmt.Sprintf("host=10.0.2.15 user=api password=netlab dbname=api sslmode=disable")
 
 	db, err := sql.Open("postgres", dbinfo)
 	if err != nil {
@@ -25,7 +25,7 @@ func main() {
 	}
 
 	for rows.Next() {
-		var name int
+		var name string
 		err = rows.Scan(&name)
 		if err != nil {
 			panic(err)
