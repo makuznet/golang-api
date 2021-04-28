@@ -41,8 +41,17 @@ func main() {
 
 	fmt.Println("Server started")
 
+	http.HandleFunc("/v1/products/add", addProduct)
 	http.HandleFunc("/v1/products/", getProducts)
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func addProduct(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
+	} else {
+		fmt.Fprintf(w, "Product was edded successfully\n")
+	}
 }
 
 func getProducts(w http.ResponseWriter, r *http.Request) {

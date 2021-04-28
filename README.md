@@ -156,6 +156,9 @@ curl -D - -s http://127.0.0.1:8080/v1/products/
 curl -D -s http://127.0.0.1:8080/v1/products/ | python -m json.tool
 curl -s http://127.0.0.1:8080/v1/products/
 ```
+"-D -" — show HTTP response;
+-s — be silent;
+-X — elaborate on HTTP method;
 
 ## Acknowledgments
 
