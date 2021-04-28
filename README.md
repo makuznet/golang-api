@@ -155,9 +155,11 @@ curl -D - -s http://127.0.0.1:8080/makuznet
 curl -D - -s http://127.0.0.1:8080/v1/products/
 curl -D -s http://127.0.0.1:8080/v1/products/ | python -m json.tool
 curl -s http://127.0.0.1:8080/v1/products/
+curl -D - -X POST http://127.0.0.1:8080/v1/products/add -d '{"Title":"test1","Price":33,"Description":"The coolest stuff","Category":"men clothes","Image":"https://fakeapi.com/thecoolestimage.jpg"}'
+
 ```
 "-D -" — show HTTP response;
--s — be silent;
+-s — be silent, do not show errors;
 -X — elaborate on HTTP method;
 
 ## Acknowledgments

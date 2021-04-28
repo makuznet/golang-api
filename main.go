@@ -50,7 +50,34 @@ func addProduct(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 	} else {
-		fmt.Fprintf(w, "Product was edded successfully\n")
+
+		decoder := json.NewDecoder(r.Body)
+
+		var g_product Product
+
+		err := decoder.Decode(&g_product)
+		if err != nil {
+			panic(err)
+		}
+
+		query := fmt.Sprintf("INSERT INTO products(title, price, description, category, image) VALUES('%s', %d, '%s', '%s', '%s') RETURNING id", g_product.Title, g_product.Price, g_product.Description, g_product.Category, g_product.Image)
+
+		fmt.Println("# Inserting")
+		rows, err := db.Query(query)
+		if err != nil {
+			panic(err)
+		}
+
+		for rows.Next() {
+
+			var id int
+
+			err = rows.Scan(&id)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Fprintf(w, "{\"id\":%d}", id)
+		}
 	}
 }
 
