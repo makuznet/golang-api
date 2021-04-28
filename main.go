@@ -2,12 +2,26 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
 	_ "github.com/lib/pq"
 )
+
+type Product struct {
+	Id          int
+	Title       string
+	Price       int
+	Description string
+	Category    string
+	Image       string
+}
+
+type Products struct {
+	Products []Product
+}
 
 func main() {
 
@@ -18,6 +32,7 @@ func main() {
 }
 
 func getProducts(w http.ResponseWriter, r *http.Request) {
+	w_array := Products{}
 
 	db, err := sql.Open("postgres", "host=10.0.2.15 user=api password=netlab dbname=api sslmode=disable")
 	if err != nil {
@@ -25,26 +40,23 @@ func getProducts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("# Querying")
-	rows, err := db.Query("SELECT id, title, price, description, category, image from products")
+	rows, err := db.Query("SELECT id,title,price,description,category,image from products")
 	if err != nil {
 		panic(err)
 	}
 
 	for rows.Next() {
-		var id int
-		var title string
-		var price int
-		var description string
-		var category string
-		var image string
 
-		err = rows.Scan(&id, &title, &price, &description, &category, &image)
+		w_product := Product{}
+
+		err = rows.Scan(&w_product.Id, &w_product.Title, &w_product.Price, &w_product.Description, &w_product.Category, &w_product.Image)
 		if err != nil {
 			panic(err)
 		}
-
-		fmt.Fprintf(w, "%d\n %s\n %d\n %s\n %s\n %s\n", id, title, price, description, category, image)
+		w_array.Products = append(w_array.Products, w_product)
 	}
+
+	json.NewEncoder(w).Encode(w_array)
 
 	db.Close()
 }

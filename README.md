@@ -72,6 +72,7 @@ grant all on sequence products_id_seq to api;
 # populate products table
 insert into products values(1,'Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops',109.95,'Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday','men clothing','https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg');
 
+insert into products values(2,'Mens Casual Premium Slim Fit T-Shirts',22.3,'Slim-fitting style, contrast raglan long sleeve, three-button henley placket, light weight & soft fabric for breathable and comfortable wearing. And Solid stitched shirts with round neck made for durability and a great fit for casual fashion wear and diehard baseball fans. The Henley style round neckline includes a three-button placket.','men clothing','https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg');
 
 \q # exit from the postgres console
 
@@ -102,7 +103,26 @@ w — write to the http listener;
 %d\n — print integer (%d) and add a new line (\n);
 id, title, etc — vars, which come from a request to the Postgres database;
 
- 
+### Structure
+When describing the structure of Products for the "encoding/json" module correct performance, describe Product structure first: 
+```bash
+type Product struct {
+	Id          int
+	Title       string
+	Price       int
+	Description string
+	Category    string
+	Image       string
+}
+``` 
+`THE FIRST LETTER in Id, Title, etc MUST BE A CAPITAL LETTER`
+
+Then say that Products consists of many Product blocks:
+```bash
+type Products struct {
+	Products []Product
+}
+```
 
 ### Golang installing
 ```bash
@@ -125,6 +145,16 @@ go mod init pkg/mod # relative path for a module to get initialized
 ### Check if an json string is correct 
 ```bash
 curl -D -s http://127.0.0.1:8080/v1/products/ | python -m json.tool
+```
+
+### curl requests history (based on commits)
+```bash
+curl -D - -s 127.0.0.1:8080
+curl -D - -s http://127.0.0.1:8080/
+curl -D - -s http://127.0.0.1:8080/makuznet
+curl -D - -s http://127.0.0.1:8080/v1/products/
+curl -D -s http://127.0.0.1:8080/v1/products/ | python -m json.tool
+curl -s http://127.0.0.1:8080/v1/products/
 ```
 
 ## Acknowledgments
