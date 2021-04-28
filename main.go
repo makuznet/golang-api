@@ -10,6 +10,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// A global var used when connecting to a db
+var db *sql.DB
+
 type Product struct {
 	Id          int
 	Title       string
@@ -25,6 +28,17 @@ type Products struct {
 
 func main() {
 
+	var err error
+
+	// This allows to have just one connection to a db
+	db, err = sql.Open("postgres", "host=10.0.2.15 user=api password=netlab dbname=api sslmode=disable")
+	if err != nil {
+		panic(err)
+	}
+
+	// do not close a connection to a db until main function is closed
+	defer db.Close()
+
 	fmt.Println("Server started")
 
 	http.HandleFunc("/v1/products/", getProducts)
@@ -33,11 +47,6 @@ func main() {
 
 func getProducts(w http.ResponseWriter, r *http.Request) {
 	w_array := Products{}
-
-	db, err := sql.Open("postgres", "host=10.0.2.15 user=api password=netlab dbname=api sslmode=disable")
-	if err != nil {
-		panic(err)
-	}
 
 	fmt.Println("# Querying")
 	rows, err := db.Query("SELECT id,title,price,description,category,image from products")
@@ -57,6 +66,4 @@ func getProducts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(w_array)
-
-	db.Close()
 }
