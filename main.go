@@ -46,24 +46,29 @@ func main() {
 }
 
 func getProducts(w http.ResponseWriter, r *http.Request) {
-	w_array := Products{}
 
-	fmt.Println("# Querying")
-	rows, err := db.Query("SELECT id,title,price,description,category,image from products")
-	if err != nil {
-		panic(err)
-	}
+	if r.Method != "GET" {
+		http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
+	} else {
+		w_array := Products{}
 
-	for rows.Next() {
-
-		w_product := Product{}
-
-		err = rows.Scan(&w_product.Id, &w_product.Title, &w_product.Price, &w_product.Description, &w_product.Category, &w_product.Image)
+		fmt.Println("# Querying")
+		rows, err := db.Query("SELECT id,title,price,description,category,image from products")
 		if err != nil {
 			panic(err)
 		}
-		w_array.Products = append(w_array.Products, w_product)
-	}
 
-	json.NewEncoder(w).Encode(w_array)
+		for rows.Next() {
+
+			w_product := Product{}
+
+			err = rows.Scan(&w_product.Id, &w_product.Title, &w_product.Price, &w_product.Description, &w_product.Category, &w_product.Image)
+			if err != nil {
+				panic(err)
+			}
+			w_array.Products = append(w_array.Products, w_product)
+		}
+
+		json.NewEncoder(w).Encode(w_array)
+	}
 }
