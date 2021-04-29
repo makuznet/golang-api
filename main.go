@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
-	"path"
+	"strconv"
 
 	_ "github.com/lib/pq"
 )
@@ -43,26 +42,29 @@ func main() {
 
 	fmt.Println("Server started")
 
-	http.HandleFunc("/v1/products/", getProducts)
-	http.HandleFunc("/v1/products/:id/", getProduct)
+	http.HandleFunc("/v1/products/", getProduct)
 	http.HandleFunc("/v1/products/add", addProduct)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-// Get all products information
-func getProducts(w http.ResponseWriter, r *http.Request) {
+// Get product info: all or by a product id
+func getProduct(w http.ResponseWriter, r *http.Request) {
+
+	productId, _ := strconv.Atoi(r.URL.Path[13:])
 
 	if r.Method != "GET" {
 		http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
-	} else {
-		w_array := Products{}
+	} else if productId != 0 {
 
-		fmt.Println("# Querying")
-		rows, err := db.Query("SELECT id,title,price,description,category,image from products")
+		fmt.Println("Getting product info by userId:", productId)
+
+		rows, err := db.Query("SELECT id, title, price, description, category, image from products where id=$1", productId)
 		if err != nil {
 			panic(err)
 		}
+
+		w_array := Products{}
 
 		for rows.Next() {
 
@@ -76,39 +78,29 @@ func getProducts(w http.ResponseWriter, r *http.Request) {
 		}
 
 		json.NewEncoder(w).Encode(w_array)
-	}
-}
 
-// Get some product info
-func getProduct(w http.ResponseWriter, r *http.Request) {
-
-	userId :=
-
-	if r.Method != "GET" {
-		http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
 	} else {
-		u_array := Products{}
 
-		// r.URL.Path[1:]
-
-		fmt.Println("# Eliborating")
-		rows, err := db.Query("SELECT id,title,price,description,category,image from products where id = $1", userId)
+		fmt.Println("Getting the list of products")
+		rows, err := db.Query("SELECT id,title,price,description,category,image from products")
 		if err != nil {
 			panic(err)
 		}
 
+		w_array := Products{}
+
 		for rows.Next() {
 
-			u_product := Product{}
+			w_product := Product{}
 
-			err = rows.Scan(&u_product.Id, &u_product.Title, &u_product.Price, &u_product.Description, &u_product.Category, &u_product.Image)
+			err = rows.Scan(&w_product.Id, &w_product.Title, &w_product.Price, &w_product.Description, &w_product.Category, &w_product.Image)
 			if err != nil {
 				panic(err)
 			}
-			u_array.Products = append(u_array.Products, u_product)
+			w_array.Products = append(w_array.Products, w_product)
 		}
 
-		json.NewEncoder(w).Encode(u_array)
+		json.NewEncoder(w).Encode(w_array)
 	}
 }
 
